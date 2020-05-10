@@ -1,99 +1,69 @@
 [![TypeScript version][ts-badge]][typescript-38]
 [![Node.js version][nodejs-badge]][nodejs]
-[![APLv2][license-badge]][LICENSE]
-[![Build Status - Travis][travis-badge]][travis-ci]
-[![Build Status - GitHub Actions][gha-badge]][gha-ci]
-[![Sponsor][sponsor-badge]][sponsor]
+[![MIT][license-badge]][LICENSE]
 
-# node-typescript-boilerplate
+# floip-results-utils
 
-👩🏻‍💻 Developer Ready: A comprehensive template. Works out of the box for most [Node.js][nodejs] projects.
+A set of Typescript utilities for working with Flow Results packages and data, from the [Flow Interoperability Project](https://flowinterop.org).
+For the Flow Results standard, see:
 
-🏃🏽 Instant Value: All basic tools included and configured:
++ https://floip.gitbook.io/flow-results-specification/
++ http://github.com/floip/flow-results
 
-+ [TypeScript][typescript] [3.8][typescript-38]
-+ [ESLint][eslint] with some initial rules recommendation
-+ [Jest][jest] for fast unit testing and code coverage
-+ Type definitions for Node.js and Jest
-+ [Prettier][prettier] to enforce consistent code style
-+ NPM [scripts](#available-scripts) for common operations
-+ simple example of TypeScript code and unit test
-+ .editorconfig for consistent file format
-+ example configuration for [GitHub Actions][gh-actions] and [Travis CI][travis]
+This library provides:
 
-🤲 Free as in speech: available under the APLv2 license.
++ Typescript model objects for representing and validating Flow Results packages: models/FlowResultsDataPackage.ts
++ A client library that wraps axios for operations on the Flow Results API: services/FlowResultsClient.ts
++ Upcoming: useful conversion libraries, such as converting Flow Results to [FHIR Questionnaire](https://www.hl7.org/fhir/questionnaire.html) and [QuestionnaireResponse](https://www.hl7.org/fhir/questionnaireresponse.html) from the FHIR specification.
+
 
 ## Getting Started
 
-This project is intended to be used with the latest Active LTS release of [Node.js][nodejs].
+This library is intended to be compatible from the browser or within Node.js applications. 
 
-### Use as a repository template
+## Usage
 
-To start, just click the **[Use template][repo-template-action]** link (or the green button). Now start adding your code in the `src` and unit tests in the `__tests__` directories.
+To import a FlowResultsDataPackage from JSON and validate it:
 
-### Clone repository
+```javascript
+import { FlowResultsDataPackage, parse } from '@floip/flow-results-utils';
 
-To clone the repository use the following commands:
-
-```sh
-git clone https://github.com/jsynowiec/node-typescript-boilerplate
-cd node-typescript-boilerplate
-npm install
+const frPackage = parse(FlowResultsDataPackage, JSON.parse(flowResultsPackageText));
 ```
 
-### Download latest release
+To use the client to access a Flow Results server, and retrieve a Flow Results data package:
 
-Download and unzip current `master` branch or one of tags:
+```javascript
+import { FlowResultsClient } from "@floip/flow-results-utils";
+const baseUrl = process.env.TEST_BASE_URL;
+const authHeader = process.env.TEST_AUTH_HEADER;
 
-```sh
-wget https://github.com/jsynowiec/node-typescript-boilerplate/archive/master.zip -O node-typescript-boilerplate.zip
-unzip node-typescript-boilerplate.zip && rm node-typescript-boilerplate.zip
+const client = new FlowResultsClient(baseUrl, authHeader);
+
+// Get list of Packages:
+
+// getPackages returns a Promise<AxiosResponse<FlowResultsDataPackage>>. The AxiosResponse allows examining the return status, headers, etc. if needed. 
+// For just the result, access AxiosResponse.data.
+// `response` will be a FlowResultsDataPackage if the promise resolves.
+const packages = await client.getPackages().then((r) => r.data).catch((e) => { console.log('Error', e)});
+
+// Get a simple array of available package IDs:
+const packageIds = await client.getPackagesIds().then((r) => r.data).catch((e) => { console.log('Error', e)});
+
+// Get a Package:
+const frPackage = await client.getPackage(packageIds[0]).then((r) => r.data).catch((e) => { console.log('Error', e)});
+
+// Get the first page of Responses from a Package, with filters and parameters:
+// (responses1 is a FlowResultsResponseSet, which can be used to paginate through the remaining Responses.)
+const responses1 = await client.getResponsesFromPackage(frPackage,
+                { 
+                    'filter[start-timestamp]' : '2020-03-20 12:00:00',
+                    'page[size]': '2'
+                }
+                ).then((r) => r.data).catch((e) => { console.log('Error', e)});
+
+// Get the next page of Responses:
+const responses2 = await responses1.next().then((r) => r.data).catch((e) => { console.log('Error', e)});
 ```
 
-## Available Scripts
 
-+ `clean` - remove coverage data, Jest cache and transpiled files,
-+ `build` - transpile TypeScript to ES6,
-+ `build:watch` - interactive watch mode to automatically transpile source files,
-+ `lint` - lint source files and tests,
-+ `test` - run tests,
-+ `test:watch` - interactive watch mode to automatically re-run tests
-
-## Additional Informations
-
-### Writing tests in JavaScript
-
-Writing unit tests in TypeScript can sometimes be troublesome and confusing. Especially when mocking dependencies and using spies.
-
-This is **optional**, but if you want to learn how to write JavaScript tests for TypeScript modules, read the [corresponding wiki page][wiki-js-tests].
-
-## Backers & Sponsors
-
-Support this project by becoming a sponsor.
-
-## License
-Licensed under the APLv2. See the [LICENSE](https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE) file for details.
-
-[ts-badge]: https://img.shields.io/badge/TypeScript-3.8-blue.svg
-[nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012.13-blue.svg
-[nodejs]: https://nodejs.org/dist/latest-v12.x/docs/api/
-[travis-badge]: https://travis-ci.org/jsynowiec/node-typescript-boilerplate.svg?branch=master
-[travis-ci]: https://travis-ci.org/jsynowiec/node-typescript-boilerplate
-[gha-badge]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fjsynowiec%2Fnode-typescript-boilerplate%2Fbadge&style=flat
-[gha-ci]: https://github.com/jsynowiec/node-typescript-boilerplate/actions
-[typescript]: https://www.typescriptlang.org/
-[typescript-38]: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html
-[license-badge]: https://img.shields.io/badge/license-APLv2-blue.svg
-[license]: https://github.com/jsynowiec/node-typescript-boilerplate/blob/master/LICENSE
-
-[sponsor-badge]: https://img.shields.io/badge/♥-Sponsor-fc0fb5.svg
-[sponsor]: https://github.com/sponsors/jsynowiec
-
-[jest]: https://facebook.github.io/jest/
-[eslint]: https://github.com/eslint/eslint
-[wiki-js-tests]: https://github.com/jsynowiec/node-typescript-boilerplate/wiki/Unit-tests-in-plain-JavaScript
-[prettier]: https://prettier.io
-[gh-actions]: https://github.com/features/actions
-[travis]: https://travis-ci.org
-
-[repo-template-action]: https://github.com/jsynowiec/node-typescript-boilerplate/generate

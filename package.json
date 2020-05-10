@@ -1,7 +1,7 @@
 {
-  "name": "node-typescript-boilerplate",
-  "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
+  "name": "@floip/flow-results-utils-ts",
+  "version": "0.0.1",
+  "description": "Typescript utilities for working with Flow Results packages and data, from the Flow Interoperability Project.",
   "engines": {
     "node": ">= 12.13 <13"
   },
@@ -31,6 +31,11 @@
   "author": "Jakub Synowiec <github@jakubsynowiec.info>",
   "license": "Apache-2.0",
   "dependencies": {
+    "@ahryman40k/ts-fhir-types": "^4.0.25",
+    "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
+    "neverthrow": "^2.2.1",
+    "sparkson": "^1.3.4",
     "tslib": "~1.10.0"
   }
 }
