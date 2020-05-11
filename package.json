@@ -1,5 +1,5 @@
 {
-  "name": "@floip/flow-results-utils-ts",
+  "name": "@floip/flow-results-utils",
   "version": "0.0.1",
   "description": "Typescript utilities for working with Flow Results packages and data, from the Flow Interoperability Project.",
   "engines": {
@@ -28,8 +28,8 @@
     "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
-  "author": "Jakub Synowiec <github@jakubsynowiec.info>",
-  "license": "Apache-2.0",
+  "author": "Mark Boots <mark.boots@viamo.io>",
+  "license": "MIT",
   "dependencies": {
     "@ahryman40k/ts-fhir-types": "^4.0.25",
     "axios": "^0.19.2",
