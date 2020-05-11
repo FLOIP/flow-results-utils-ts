@@ -66,4 +66,12 @@ const responses1 = await client.getResponsesFromPackage(frPackage,
 const responses2 = await responses1.next().then((r) => r.data).catch((e) => { console.log('Error', e)});
 ```
 
-
+[ts-badge]: https://img.shields.io/badge/TypeScript-3.8-blue.svg
+[nodejs-badge]: https://img.shields.io/badge/Node.js->=%2012.13-blue.svg
+[nodejs]: https://nodejs.org/dist/latest-v12.x/docs/api/
+[typescript]: https://www.typescriptlang.org/
+[typescript-38]: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-8.html
+[license-badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license]: https://github.com/FLOIP/flow-results-utils-ts/blob/master/LICENSE
+[jest]: https://facebook.github.io/jest/
+[eslint]: https://github.com/eslint/eslint
