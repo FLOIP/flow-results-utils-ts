@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/camelcase */
 import {ArrayField, Field, RawJsonField, Rule, parse } from "sparkson"
 export { parse } from "sparkson"
@@ -15,7 +16,7 @@ export type FlowResultsQuestionType = "select_one" | "select_many" | "numeric" |
 /** Definition of a Flow Results Question */
 export class FlowResultsQuestion {
     constructor(
-        @Field("type") public type: FlowResultsQuestionType,
+        @Field("type") @Rule(validateQuestionType) public type: FlowResultsQuestionType,
         @Field("label") public label: string,
         @RawJsonField("type_options") public type_options: object
     ) {};
@@ -26,7 +27,7 @@ export class FlowResultsSchemaField {
     constructor(
         @Field("name") public name: string,
         @Field("title") public title: string,
-        @Field("type") public type: DataPackageSchemaFieldType
+        @Field("type") @Rule(validateDataPackageFieldType) public type: DataPackageSchemaFieldType
     ) {};
 }
 
@@ -39,6 +40,20 @@ function validateSchemaFields(val): string {
     }
     // TODO: Check contents of all fields
     return null;
+}
+
+function validateQuestionType(val): string {
+    if(["select_one" ,  "select_many" ,  "numeric" ,  "open" ,  "text" ,  "image" ,  "video" ,  "audio" ,  "geo_point" ,  "datetime" ,  "date" ,  "time"].includes(val)) {
+        return null;
+    }
+    return "Question type '" + val + "' not valid.";
+}
+
+function validateDataPackageFieldType(val): string {
+    if(["datetime" , "string" , "any" , "object" , "number" , "integer" , "boolean" , "array" , "date" , "time" , "year" , "yearmonth" , "duration" , "geopoint" , "geojson"].includes(val)) {
+        return null;
+    }
+    return "Data Package Field type '" + val + "' not valid.";
 }
 
 
@@ -99,6 +114,20 @@ export class FlowResultsDataPackage {
     public resource() : FlowResultsResource { return this.resources[0]; }
 
 }
+
+export type FlowResultsResponse = Array<string | number | object | []>;
+
+export enum FlowResultsResponseFields {
+    _Timestamp,
+    _RowId,
+    _ContactId,
+    _SessionId,
+    _QuestionId,
+    _ResponseValue,
+    _ResponseMetadata
+}
+
+
 
 
 

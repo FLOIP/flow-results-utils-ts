@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import axios, { /*AxiosError,*/ AxiosRequestConfig, AxiosResponse, AxiosInstance } from 'axios';
-import { FlowResultsDataPackage } from '../models/FlowResultsDataPackage';
+import { FlowResultsDataPackage, FlowResultsResponse } from '../models/FlowResultsDataPackage';
 import { parse } from "sparkson";
 
 export class FlowResultsClient {
@@ -83,7 +84,7 @@ export class FlowResultsClient {
 export class FlowResultsResponseSet {
     constructor(
         public relationships,
-        public responses: Array<Array<any>>,
+        public responses: Array<FlowResultsResponse>,
         public client: FlowResultsClient,
         public originalParams: object,
         public originalConfig: AxiosRequestConfig
