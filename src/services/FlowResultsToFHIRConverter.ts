@@ -121,7 +121,7 @@ export class FlowResultsToFHIRConverter {
 
     /**
      * Convert an extract of FlowResults response rows to a FHIR QuestionnaireResponse. 
-     * This requires having all of the response rows for a single session in this array. See TODO for converting a complete FlowResultsResponseSet to multiple QuestionnaireResponses
+     * This requires having all of the response rows for a single session in this array. See fhirQuestionnaireResponsesFromFlowResultsResponseSet for converting a complete FlowResultsResponseSet to multiple QuestionnaireResponses
      * @param frSessionArray : An array of Flow Results responses (data rows) that contain all of the responses for one session / one QuestionnaireResponse. The Flow Results session_id and contact_id should be the same for all rows.
      * Example frSessionArray:
      * Columns are: 0 - Timestamp, 1 - Row/response ID, 2 - Contact ID, 3 - Session ID, 4 - Question ID, 5 - Response, 6 - Response Metadata (See: FlowResultsResponseFields)
@@ -132,11 +132,13 @@ export class FlowResultsToFHIRConverter {
         ["2019-04-09T23:40:38+00:00","962497262641369088","962496826479890432","962496826597330944","q_1520727585604_31","3.0000",{}],
         ["2019-04-09T23:41:12+00:00","962497300541100032","962496826479890432","962496826597330944","q_1520727871659_64","Transformative, not just efficiency, improvements to implementers.",{"type": "text"}]
      * ]
+     * @param subjectFormatter : (Optional) A callback to generate the desired subject of the QuestionnaireResponse, so this can be customized by systems that manage Contacts/Subjects in a specific way.  See FlowResultsToFHIRConverter.defaultSubjectReference() for an example.
      */
     public toQuestionnaireResponse(
         frSessionArray: Array<FlowResultsResponse>,
-        subjectFormatter: (response: FlowResultsResponse, fr: FlowResultsDataPackage) => R4.IReference = this.defaultSubjectReference
+        subjectFormatter: (response: FlowResultsResponse, fr: FlowResultsDataPackage) => R4.IReference = FlowResultsToFHIRConverter.defaultSubjectReference
         ) : R4.IQuestionnaireResponse {
+
         const fhirQR: R4.IQuestionnaireResponse = {} as R4.IQuestionnaireResponse;
         fhirQR.resourceType = "QuestionnaireResponse";
         // ID: We use the concatenation of FR Package Id and Response Session ID. This could be replaced with a callback function that is passed in, to allow users to control the ID that is used.
@@ -164,7 +166,6 @@ export class FlowResultsToFHIRConverter {
      * @param frQ The Flow Results Question to convert to (one or more) FHIR Questionnaire Items
      * @param idString The ID string of the Flow Results Question
      */
-
     protected flowResultsQuestionToFHIRQuestionnaireItem(frQ: FlowResultsQuestion, idString: string) : R4.IQuestionnaire_Item {
         const fhirQ: R4.IQuestionnaire_Item = {} as R4.IQuestionnaire_Item;
         fhirQ.linkId = idString;
@@ -238,7 +239,7 @@ export class FlowResultsToFHIRConverter {
      * @param fr The Flow Results data package, for context
      */
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    public defaultSubjectReference(response: FlowResultsResponse, _fr: FlowResultsDataPackage): R4.IReference {
+    static defaultSubjectReference(response: FlowResultsResponse, _fr: FlowResultsDataPackage): R4.IReference {
         return {
             "id": response[FlowResultsResponseFields._ContactId] as string,
             "display": "Contact ID " + response[FlowResultsResponseFields._ContactId]
@@ -319,12 +320,36 @@ export class FlowResultsToFHIRConverter {
 
 }
 
+/**
+ * (Function API) Convert a FlowResultsDataPackage Descriptor into a FHIR Questionnaire
+ * Example reference: https://www.hl7.org/fhir/questionnaire.html
+ * @param fr Instance of a FlowResultsDataPackage
+ */
 export function fhirQuestionnaireFromFlowResults(fr: FlowResultsDataPackage): R4.IQuestionnaire {
     const converter = new FlowResultsToFHIRConverter(fr);
     return converter.toQuestionnaire();
 }
 
-export function fhirQuestionnaireResponseFromFlowResults(fr: FlowResultsDataPackage, frSessionArray: Array<FlowResultsResponse>): R4.IQuestionnaireResponse {
+/**
+ * (Function API) Convert an extract of FlowResults response rows to a FHIR QuestionnaireResponse. 
+ * This requires having all of the response rows for a single session in this array. See fhirQuestionnaireResponsesFromFlowResultsResponseSet() for converting a complete FlowResultsResponseSet to multiple QuestionnaireResponses
+ * @param fr : Instance of a FlowResultsDataPackage
+ * @param frSessionArray : An array of Flow Results responses (data rows) that contain all of the responses for one session / one QuestionnaireResponse. The Flow Results session_id and contact_id should be the same for all rows.
+ * Example frSessionArray:
+ * Columns are: 0 - Timestamp, 1 - Row/response ID, 2 - Contact ID, 3 - Session ID, 4 - Question ID, 5 - Response, 6 - Response Metadata (See: FlowResultsResponseFields)
+ * [
+    ["2019-04-09T23:40:12+00:00","962496841403224064","962496826479890432","962496826597330944","q_1521915343920_16","Survey again",{}],
+    ["2019-04-09T23:40:19+00:00","962497190767775744","962496826479890432","962496826597330944","q_1520727469077_84","😍OMG YES",{}],
+    ["2019-04-09T23:40:29+00:00","962497220186624000","962496826479890432","962496826597330944","q_1520739431185_81","Data understanding",{}],
+    ["2019-04-09T23:40:38+00:00","962497262641369088","962496826479890432","962496826597330944","q_1520727585604_31","3.0000",{}],
+    ["2019-04-09T23:41:12+00:00","962497300541100032","962496826479890432","962496826597330944","q_1520727871659_64","Transformative, not just efficiency, improvements to implementers.",{"type": "text"}]
+ * ]
+ * @param subjectFormatter : (Optional) A callback to generate the desired subject of the QuestionnaireResponse, so this can be customized by systems that manage Contacts/Subjects in a specific way.  See FlowResultsToFHIRConverter.defaultSubjectReference() for an example.
+ */
+export function fhirQuestionnaireResponseFromFlowResults(fr: FlowResultsDataPackage,
+    frSessionArray: Array<FlowResultsResponse>,
+    subjectFormatter: (response: FlowResultsResponse, fr: FlowResultsDataPackage) => R4.IReference = FlowResultsToFHIRConverter.defaultSubjectReference
+    ): R4.IQuestionnaireResponse {
     const converter = new FlowResultsToFHIRConverter(fr);
-    return converter.toQuestionnaireResponse(frSessionArray);
+    return converter.toQuestionnaireResponse(frSessionArray, subjectFormatter);
 }

@@ -1,5 +1,4 @@
-import { FlowResultsClient } from '../src/index'
-import { fhirQuestionnaireResponsesFromFlowResultsResponseSet } from "../src/services/fhirQuestionnaireResponsesFromFlowResultsResponseSet"
+import { FlowResultsClient, fhirQuestionnaireResponsesFromFlowResultsResponseSet } from '../src/index'
 require('dotenv').config()
 
 describe('Query Examples', () => {
@@ -16,21 +15,21 @@ describe('Query Examples', () => {
         let questionnaireResponsesCount = 0;
         
         if(frPackage) {
-            // Get First page of responses from Package
+            // Convert all Responses to QuestionnaireResponse
             await fhirQuestionnaireResponsesFromFlowResultsResponseSet(frPackage,
-                client.getResponsesFromPackage(frPackage,
-                { 
-                    'filter[start-timestamp]' : '2020-01-01 12:00:00',
-                    'page[size]': '10'
-                }
-                ),questionnaireResponses => {
+                client.getResponsesFromPackage(frPackage, { 
+                        'filter[start-timestamp]' : '2020-01-01 12:00:00',
+                        'page[size]': '10'
+                    }
+                ),
+                questionnaireResponses => {
                     questionnaireResponsesCount = questionnaireResponsesCount + questionnaireResponses.length;
-                    questionnaireResponses.forEach(_qr => {
-                        _qr;
+                    questionnaireResponses.forEach(qr => {
+                        qr;
                         // console.log(JSON.stringify(_qr, null, 2));
                     });
-                },
-                3).catch((e) => { console.log('Error', e)});
+                }
+                ).catch((e) => { console.log('Error', e)});
 
             // console.log("Found this many questionnaireResponses: " + questionnaireResponsesCount);
             expect(questionnaireResponsesCount).toEqual(expect.anything());

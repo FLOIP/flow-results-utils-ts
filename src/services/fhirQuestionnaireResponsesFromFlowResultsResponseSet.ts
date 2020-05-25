@@ -11,12 +11,19 @@ import { R4 } from  '@ahryman40k/ts-fhir-types';
  * Because there might be more responses than fit in memory, this function processes in batches (controlled via the page size parameter). 
  * You must provide a callback function that can accept an array of QuestionnaireResponse; the callback might be called one or multiple times with batches of results.
  * Note: All of the responses for one session (one QuestionnaireResponse) are not required to be ordered in Flow Results.  It's possible that a session could have responses spanning multiple pages of data. By default we assume that a session will be contained within a maximum of 3 pages of responses. You can adjust this number at the expense of memory consumption to increase reliability if a session is likely to span more pages.
+ * @param fr Flow Results Data Package to build responses for
+ * @param frResponseSetPromise The result of calling FlowResultsClient.getResponsesFromPackage(). This is where filters, query parameters, and page sizes can be specified.
+ * @param receiverFunction A callback function to receive the converted QuestionnaireResponses. It should accept an array of IQuestionnaireResponse[], and might be called multiple times.
+ * @param pagesToExamineForSessions The number of pages pulled from the Flow Results server to look across to find all responses within a session / questionnaire response.
+ * @param subjectFormatter : (Optional) A callback to generate the desired subject of the QuestionnaireResponse, so this can be customized by systems that manage Contacts/Subjects in a specific way.  See FlowResultsToFHIRConverter.defaultSubjectReference() for an example.
  */
 export async function fhirQuestionnaireResponsesFromFlowResultsResponseSet(
     fr: FlowResultsDataPackage, 
     frResponseSetPromise: Promise<AxiosResponse<FlowResultsResponseSet>>, 
     receiverFunction: (questionnaireResponses: R4.IQuestionnaireResponse[]) => any, 
-    pagesToExamineForSessions = 3): Promise<void> {
+    pagesToExamineForSessions = 3,
+    subjectFormatter: (response: FlowResultsResponse, fr: FlowResultsDataPackage) => R4.IReference = FlowResultsToFHIRConverter.defaultSubjectReference
+    ): Promise<void> {
 
     const fhirConverter = new FlowResultsToFHIRConverter(fr);
     let pageNum = -1;
@@ -51,7 +58,7 @@ export async function fhirQuestionnaireResponsesFromFlowResultsResponseSet(
             // console.log("Entered shouldFinish");
             const questionnaireResponses = [] as R4.IQuestionnaireResponse[];
             sessionIdToResponses.forEach((sessionArray) => {
-                questionnaireResponses.push(fhirConverter.toQuestionnaireResponse(sessionArray));
+                questionnaireResponses.push(fhirConverter.toQuestionnaireResponse(sessionArray, subjectFormatter));
             });
             sessionIdToResponses.clear();
             if(questionnaireResponses.length > 0) {
@@ -82,7 +89,7 @@ export async function fhirQuestionnaireResponsesFromFlowResultsResponseSet(
             const pageToClear = pageNum - pagesToExamineForSessions;
             const questionnaireResponses = [] as R4.IQuestionnaireResponse[];
             startPageToSessionIds.get(pageToClear).forEach(sessionId => {
-                questionnaireResponses.push(fhirConverter.toQuestionnaireResponse(sessionIdToResponses.get(sessionId)));
+                questionnaireResponses.push(fhirConverter.toQuestionnaireResponse(sessionIdToResponses.get(sessionId), subjectFormatter));
                 sessionIdToResponses.delete(sessionId);
             });
             // Send converted QuestionnaireResponses to receiver, if we have any

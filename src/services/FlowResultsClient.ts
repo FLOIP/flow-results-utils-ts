@@ -7,7 +7,7 @@ export class FlowResultsClient {
 
     public ai: AxiosInstance;
     /**
-     * 
+     * Construct a Client instance
      * @param baseUrl Base URL of Flow Results server: e.g. https://go.votomobile.org/api/v1.  The "/flow-results/<endpoint>" will be appended; do not include the "/flow-results"
      * @param authHeader Example: "Token 0b79bab50daca910b000d4f1a2b675d604257e42", which will be set as the Authorization header.
      */
@@ -28,6 +28,10 @@ export class FlowResultsClient {
         return this.getRaw('/flow-results/packages', config);
     }
 
+    /**
+     * Get the [list of Packages from the Flow Results server](https://floip.gitbook.io/flow-results-specification/api-specification#list-all-flow-results-packages)
+     * @param config Axios request configuration
+     */
     public getPackages(config?: AxiosRequestConfig): Promise<AxiosResponse> {
         const newConfig = {...config, transformResponse: (d: string) => {
             return JSON.parse(d).data;
@@ -35,6 +39,11 @@ export class FlowResultsClient {
         return this.getPackages_(newConfig);
     }
 
+    /**
+     * Get only an array of Package IDs from the Flow Results server.
+     * This uses the same endpoint as above, but extracts just the package IDs into an array.
+     * @param config 
+     */
     public getPackagesIds(config?: AxiosRequestConfig): Promise<AxiosResponse<Array<string>>> {
         const newConfig = {...config, transformResponse: (d:string) => {
             return JSON.parse(d).data.map((p) => p.id);
@@ -42,6 +51,11 @@ export class FlowResultsClient {
         return this.getPackages_(newConfig);
     }
 
+    /**
+     * Get a [single Package descriptor from the Flow Results server](https://floip.gitbook.io/flow-results-specification/api-specification#get-the-descriptor-of-a-package)
+     * @param id Flow Results Package ID
+     * @param config Axios request configuration
+     */
     public getPackage(id: string, config?: AxiosRequestConfig): Promise<AxiosResponse<FlowResultsDataPackage>> {
         const newConfig = {...config, transformResponse: (d: string) => {
             return parse(FlowResultsDataPackage, JSON.parse(d).data.attributes);
@@ -49,7 +63,17 @@ export class FlowResultsClient {
         return this.getRaw('/flow-results/packages/' + id, newConfig);
     }
 
-    public getResponsesFromPackage(frPackage: FlowResultsDataPackage, params: object, config?: AxiosRequestConfig): Promise<AxiosResponse<FlowResultsResponseSet>> {
+    /**
+     * Get the first page of [Responses for a Package from the Flow Results server](https://floip.gitbook.io/flow-results-specification/api-specification#get-responses-for-a-package)
+     * @param frPackage Flow Results Descriptor
+     * @param params Optional query parameters. An example would be:
+     * { 
+            'filter[start-timestamp]' : '2020-03-20 12:00:00',
+            'page[size]': '2'
+     *  }
+     * @param config Axios request configuration
+     */
+    public getResponsesFromPackage(frPackage: FlowResultsDataPackage, params: object = {}, config?: AxiosRequestConfig): Promise<AxiosResponse<FlowResultsResponseSet>> {
         const newConfig = {...config, 
             params: params,
             transformResponse: (d: string) => {
@@ -67,6 +91,16 @@ export class FlowResultsClient {
         return this.getRaw(url, newConfig);
     }
 
+    /**
+     * As an alternative to getResponsesFromPackage(), this can be used to fetch Flow Results Responses directly from an API URL.
+     * @param apiDataUrl Full URL of the JSON:API URL where the Responses are located.
+     * @param params Optional query parameters. An example would be:
+     * { 
+            'filter[start-timestamp]' : '2020-03-20 12:00:00',
+            'page[size]': '2'
+     *  }
+     * @param config Axios request configuration
+     */
     public getResponsesFromUrl(apiDataUrl: string, params: object, config?: AxiosRequestConfig): Promise<AxiosResponse<FlowResultsResponseSet>> {
         const newConfig = {...config, 
             params: params,
@@ -81,6 +115,9 @@ export class FlowResultsClient {
     }
 }
 
+/**
+ * Describes the return value of getResponsesFromPackage().  A FlowResultsResponseSet contains the data from the page (in responses), as well as the ability to fetch next() and previous() pages.
+ */
 export class FlowResultsResponseSet {
     constructor(
         public relationships,

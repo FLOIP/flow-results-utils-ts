@@ -115,8 +115,15 @@ export class FlowResultsDataPackage {
 
 }
 
+/**
+ * Describes the type of a "row" of Flow Results Responses, e.g.:
+ * ["2019-04-09T23:40:12+00:00","962496841403224064","962496826479890432","962496826597330944","q_1521915343920_16","Female",{}]
+ */
 export type FlowResultsResponse = Array<string | number | object | []>;
 
+/**
+ * Describes the fields within a FlowResultsResponse. The numeric enum values correspond to the indexes in a FlowResultsResponse.
+ */
 export enum FlowResultsResponseFields {
     _Timestamp,
     _RowId,
