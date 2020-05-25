@@ -1,6 +1,6 @@
 {
   "name": "@floip/flow-results-utils",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Typescript utilities for working with Flow Results packages and data, from the Flow Interoperability Project.",
   "engines": {
     "node": ">= 12.13 <13"
