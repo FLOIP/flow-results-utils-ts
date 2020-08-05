@@ -2,7 +2,7 @@
 [![Node.js version][nodejs-badge]][nodejs]
 [![MIT][license-badge]][LICENSE]
 
-# floip-results-utils
+# flow-results-utils
 
 A set of Typescript utilities for working with Flow Results packages and data, from the [Flow Interoperability Project](https://flowinterop.org).
 For the Flow Results standard, see:
@@ -75,7 +75,7 @@ These converters provide an object-oriented API (FlowResultsToFHIRConverter), an
 #### Usage example: Object-oriented API
 
 ```javascript
-import { FlowResultsToFHIRConverter } from '@floip/floip-results-utils'
+import { FlowResultsToFHIRConverter } from '@floip/flow-results-utils'
 // Optional: If useful for working with the types of the returned objects: R4.IQuestionnaire and R4.IQuestionnaireResponse
 import { R4 } from  '@ahryman40k/ts-fhir-types';
 
@@ -146,7 +146,7 @@ Result:
 #### Usage Example: Function API
 
 ```javascript
-import { fhirQuestionnaireFromFlowResults, fhirQuestionnaireResponseFromFlowResults } from '@floip/floip-results-utils'
+import { fhirQuestionnaireFromFlowResults, fhirQuestionnaireResponseFromFlowResults } from '@floip/flow-results-utils'
 import { R4 } from  '@ahryman40k/ts-fhir-types';
 
 // Convert a FlowResults Descriptor to a FHIR Questionnaire
@@ -161,7 +161,7 @@ console.log(JSON.stringify(fhirQuestionnaire, null, 2));
 #### Using FlowResultsClient to get all Responses from a server, and converting them all to QuestionnaireResponses
 
 ```javascript
-import { FlowResultsClient, fhirQuestionnaireResponsesFromFlowResultsResponseSet } from '@floip/floip-results-utils'
+import { FlowResultsClient, fhirQuestionnaireResponsesFromFlowResultsResponseSet } from '@floip/flow-results-utils'
 
 // Get Package Descriptor
 const client = new FlowResultsClient(baseUrl, authHeader);
