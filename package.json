@@ -5,6 +5,8 @@
   "engines": {
     "node": ">= 12.13 <13"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "devDependencies": {
     "@types/jest": "^25.1.5",
     "@types/node": "^12.12.42",
