@@ -1,4 +1,4 @@
-import { FlowResultsClient, fhirQuestionnaireResponsesFromFlowResultsResponseSet } from '../src/index'
+import { FlowResultsClient, fhirQuestionnaireResponsesFromFlowResultsResponseSet } from '../index'
 require('dotenv').config()
 
 describe('Query Examples', () => {

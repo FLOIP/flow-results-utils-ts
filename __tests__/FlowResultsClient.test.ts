@@ -1,4 +1,4 @@
-import { FlowResultsClient } from '../src/index'
+import { FlowResultsClient } from '../index'
 require('dotenv').config()
 
 describe('Query Examples', () => {

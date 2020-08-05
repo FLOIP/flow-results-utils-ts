@@ -1,4 +1,4 @@
-import { FlowResultsDataPackage, parse } from '../src/index'
+import { FlowResultsDataPackage, parse } from '../index'
 
 describe('Import and Validation', () => {
 

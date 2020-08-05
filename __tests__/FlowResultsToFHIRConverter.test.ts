@@ -1,5 +1,5 @@
-import { FlowResultsDataPackage, parse } from '../src/index'
-import { fhirQuestionnaireFromFlowResults, fhirQuestionnaireResponseFromFlowResults } from '../src/index'
+import { FlowResultsDataPackage, parse } from '../index'
+import { fhirQuestionnaireFromFlowResults, fhirQuestionnaireResponseFromFlowResults } from '../index'
 
 describe('Usage Examples', () => {
 

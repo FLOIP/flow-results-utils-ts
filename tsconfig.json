@@ -24,7 +24,8 @@
   },
   "include": [
     "src/**/*",
-    "__tests__/**/*"
+    "__tests__/**/*", 
+    "index.ts"
   ],
   "exclude": [
     "node_modules",
