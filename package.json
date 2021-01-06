@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@ahryman40k/ts-fhir-types": "^4.0.25",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "dotenv": "^8.2.0",
     "neverthrow": "^2.3.0",
     "sparkson": "^1.3.4",
